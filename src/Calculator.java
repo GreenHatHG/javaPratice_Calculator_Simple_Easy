@@ -120,9 +120,11 @@ public class Calculator extends JFrame implements ActionListener
             }
             else
             {
-                    if(i == 0) //处理-1+3这种等式
+                    if(i == 0) //处理-1+3，+1+2这种等式
                     {
-                        double temp = st1.pop() * (-1);
+                        double temp = st1.pop();
+                        if(c == '-')
+                          temp *= (-1);
                         st1.push(temp);
                     }
                     else
