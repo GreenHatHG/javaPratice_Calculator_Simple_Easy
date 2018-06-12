@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+import java.math.*;
 
 public class Calculator extends JFrame implements ActionListener
 {
@@ -97,12 +98,25 @@ public class Calculator extends JFrame implements ActionListener
     {
         Stack<Double> st1 = new Stack<Double>();
         Stack<Character> st2 = new Stack<Character>();
-        for (int i = s.length() - 1; i >= 0; i--)
+        int i = s.length() - 1;
+        while(i >= 0)
         {
             char c = s.charAt(i);
-            if (c >= '0' && c <= '9')
+            int indexNum = 0;
+            double num = 0;
+            if(c >= '0' && c <= '9')
             {
-                    st1.push((double) (c - '0'));
+                int j;
+                for(j = i; j >= 0; j--)
+                    {
+                        char c1 = s.charAt(j);
+                        if(!(c1 >= '0' && c1 <= '9'))
+                            break;
+                        double temp= (double) (c1 - '0');
+                        num += Math.pow(10, indexNum++) * temp;
+                    }
+                i = j;
+                st1.push(num);
             }
             else
             {
@@ -113,6 +127,7 @@ public class Calculator extends JFrame implements ActionListener
                     }
                     else
                         st2.push(c);
+                    i--;
             }
         }
         while(!st2.empty())
@@ -160,6 +175,7 @@ public class Calculator extends JFrame implements ActionListener
                         else
                             st1.push(d1 / d2);
                         st1.push(temp);
+                        st2.push(st2op1);
                     }
                     else
                     {
@@ -169,8 +185,8 @@ public class Calculator extends JFrame implements ActionListener
                             st1.push(d1 + d2);
                         else if(st2op1 == '-' )
                             st1.push(d1 - d2 );
+                        st2.push(st2op2);
                     }
-                    st2.push(st2op1);
                 }
             }
         }
@@ -181,7 +197,7 @@ public class Calculator extends JFrame implements ActionListener
         Calculator cal = new Calculator();
     }
 }
-//2x2+2x2/2+3
+//2x2+2x2/2+3 = 9
 //2*3/2+3/6
 //3/6*6-1/2-1
 //1-2x2-3/6
