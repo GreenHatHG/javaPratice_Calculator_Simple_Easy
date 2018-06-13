@@ -272,7 +272,7 @@ public class Calculator extends JFrame implements ActionListener
     public double calculate(String s)
     {
         s = suffix(s);
-        System.out.print(s);
+ //       System.out.print(s);
         Stack<Double>sta = new Stack<Double>();
         int len = 0, pos = 0; boolean first = true;
         for(int i = 0; i < s.length() ; i++)
