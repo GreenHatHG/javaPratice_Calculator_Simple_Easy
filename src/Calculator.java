@@ -10,8 +10,8 @@ public class Calculator extends JFrame implements ActionListener
     JButton[] buttons;
     JButton CE;
     JTextField text;
-    String[] name = {"1", "2", "3", "+", "4", "5", "6", "-", "7",
-            "8", "9", "x", "0", "/", "=", "Back"};
+    String[] name = {"1", "2", "3", "+", "-", "(", "4", "5", "6",
+            "x", "/", ")", "7", "8", "9", "0", "Back", "="};
     Calculator()
     {
         super();
@@ -25,7 +25,7 @@ public class Calculator extends JFrame implements ActionListener
         jp1.setPreferredSize(new Dimension(0, 30));
 
         jp2 = new JPanel();
-        jp2.setLayout(new GridLayout(4, 4));
+        jp2.setLayout(new GridLayout(3, 6));
         buttons = new JButton[name.length];
         for(int i = 0; i < name.length; i++)
         {
@@ -38,6 +38,7 @@ public class Calculator extends JFrame implements ActionListener
         content.setLayout(new BorderLayout());
         content.add(jp1, BorderLayout.NORTH);
         content.add(jp2, BorderLayout.CENTER);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(400, 300);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -94,7 +95,7 @@ public class Calculator extends JFrame implements ActionListener
         }
     }
 
-    public double calculate(String s)
+   /* public double calculate(String s) //没有加括号功能时计算中缀表达式的办法
     {
         Stack<Double> st1 = new Stack<Double>();
         Stack<Character> st2 = new Stack<Character>();
@@ -193,7 +194,121 @@ public class Calculator extends JFrame implements ActionListener
             }
         }
         return st1.pop();
+    }*/
+
+    public double convert(String s) //将字符串转化为数字
+    {
+        double ans = 0;
+        for(int i = 0; i < s.length(); i++)
+            ans = ans * 10 + s.charAt(i) - '0';
+        return ans;
     }
+
+    public String suffix(String s)
+    {
+        Stack<Character>op = new Stack<Character>();
+        String ss = "";
+        int pos = 0, len = 0; boolean first = true; //为了分割等式中的数字
+        for(int i = 0; i < s.length(); i++)
+        {
+            char c = s.charAt(i);
+            if (c >= '0' && c <= '9')
+            {
+                if (first)
+                {
+                    pos = i;
+                    first = false;
+                }
+                len++;
+                if(i == s.length() - 1)
+                {
+                    String temp = s.substring(pos, pos+ len);
+                    ss += temp + ".";
+                }
+            }
+            else
+            {
+                String temp = s.substring(pos, pos+ len);
+                if(len != 0)
+                    ss += temp + ".";
+                first = true;
+                len = 0;
+
+                if(op.empty())
+                    op.push(c);
+                else
+                {
+                    switch(c)
+                    {
+                        case '+':
+                        case '-':
+                            while(!op.empty() && op.peek() != '(')
+                                ss += op.pop();
+                            op.push(c);
+                            break;
+                        case 'x':
+                        case '/':
+                            while(!op.empty() && op.peek() != '+' && op.peek() != '-' && op.peek() != '(')
+                                ss += op.pop();
+                            op.push(c);
+                            break;
+                        case '(':
+                            op.push(c);
+                            break;
+                        case ')':
+                            while(!op.empty() && op.peek() != '(')
+                                ss += op.pop();
+                            op.pop();
+                            break;
+                    }
+                }
+            }
+        }
+        while(!op.empty())
+            ss += op.pop();
+        return ss;
+    }
+
+    public double calculate(String s)
+    {
+        s = suffix(s);
+        System.out.print(s);
+        Stack<Double>sta = new Stack<Double>();
+        int len = 0, pos = 0; boolean first = true;
+        for(int i = 0; i < s.length() ; i++)
+        {
+            char c = s.charAt(i);
+            if(c>= '0' && c <= '9')
+            {
+                if(first)
+                {
+                    first = false;
+                    pos = i;
+                }
+                len++;
+            }
+            else if(c == '.')
+            {
+                sta.push(convert(s.substring(pos, pos + len)));
+                first = true;
+                len = 0;
+            }
+            else
+            {
+                double n1 = sta.pop();
+                double n2 = sta.pop();
+                switch(c)
+                {
+                    case '-': {sta.push(n2 - n1); break;}
+                    case '+': {sta.push(n2 + n1); break;}
+                    case 'x': {sta.push(n2 * n1); break;}
+                    case '/': {sta.push(n2 / n1); break;}
+                }
+            }
+        }
+        return sta.pop();
+    }
+
     public static void main(String[] args)
     {
         Calculator cal = new Calculator();
